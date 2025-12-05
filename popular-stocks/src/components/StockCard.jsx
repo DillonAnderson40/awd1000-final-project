@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+const API_KEY = "d4pljl1r01qjpnb03esgd4pljl1r01qjpnb03et0";
 
 export default function StockCard({ stock, onDelete }) {
   const [currentPrice, setCurrentPrice] = useState(null);
@@ -11,12 +12,13 @@ export default function StockCard({ stock, onDelete }) {
   async function fetchPrice() {
     try {
       const res = await fetch(
-        `https://api.twelvedata.com/price?symbol=${stock.ticker}`
+        `https://finnhub.io/api/v1/quote?symbol=${stock.ticker}&token=${API_KEY}`
       );
+
       const data = await res.json();
 
-      if (data.price) {
-        setCurrentPrice(Number(data.price).toFixed(2));
+      if (data.c) {
+        setCurrentPrice(Number(data.c).toFixed(2));
       } else {
         // fallback to simulated values if API fails
         const fallback = (
