@@ -14,20 +14,18 @@ export default function StockCard({ stock, onDelete }) {
       const res = await fetch(
         `https://finnhub.io/api/v1/quote?symbol=${stock.ticker}&token=${API_KEY}`
       );
-
       const data = await res.json();
 
       if (data.c) {
         setCurrentPrice(Number(data.c).toFixed(2));
+        setPrevClose(Number(data.pc).toFixed(2));
       } else {
-        // fallback to simulated values if API fails
         const fallback = (
           Number(stock.targetPrice) * (0.8 + Math.random() * 0.6)
         ).toFixed(2);
         setCurrentPrice(fallback);
       }
-    } catch {
-      // fallback to simulated values on error
+    } catch (err) {
       const fallback = (
         Number(stock.targetPrice) * (0.8 + Math.random() * 0.6)
       ).toFixed(2);
@@ -35,8 +33,19 @@ export default function StockCard({ stock, onDelete }) {
     }
   }
 
+  // Fetch immediately on load
   fetchPrice();
+
+  // Auto-refresh every 15 seconds
+  const interval = setInterval(() => {
+    fetchPrice();
+  }, 15000); // 15000 ms = 15 seconds
+
+  // Cleanup interval when component unmounts
+  return () => clearInterval(interval);
+
 }, [stock.ticker, stock.targetPrice]);
+
 
 
   const targetReached =
