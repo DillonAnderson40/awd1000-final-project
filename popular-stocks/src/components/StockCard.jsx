@@ -8,13 +8,38 @@ export default function StockCard({ stock, onDelete }) {
 
   // TEMP: simulate price values until you want API integration
   useEffect(() => {
-    const random = (
-      Number(stock.targetPrice) * (0.8 + Math.random() * 0.6)
-    ).toFixed(2);
-    setCurrentPrice(random);
-  }, [stock]);
+  async function fetchPrice() {
+    try {
+      const res = await fetch(
+        `https://api.twelvedata.com/price?symbol=${stock.ticker}`
+      );
+      const data = await res.json();
 
-  const targetReached = currentPrice >= stock.targetPrice;
+      if (data.price) {
+        setCurrentPrice(Number(data.price).toFixed(2));
+      } else {
+        // fallback to simulated values if API fails
+        const fallback = (
+          Number(stock.targetPrice) * (0.8 + Math.random() * 0.6)
+        ).toFixed(2);
+        setCurrentPrice(fallback);
+      }
+    } catch {
+      // fallback to simulated values on error
+      const fallback = (
+        Number(stock.targetPrice) * (0.8 + Math.random() * 0.6)
+      ).toFixed(2);
+      setCurrentPrice(fallback);
+    }
+  }
+
+  fetchPrice();
+}, [stock.ticker, stock.targetPrice]);
+
+
+  const targetReached =
+  currentPrice && Number(currentPrice) >= Number(stock.targetPrice);
+
 
   return (
     <div
