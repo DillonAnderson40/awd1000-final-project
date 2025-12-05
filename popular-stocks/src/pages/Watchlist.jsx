@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import StockCard from "../components/StockCard";
-import SearchBar from "../components/SearchBar";
 
 export default function Watchlist() {
   const [stocks, setStocks] = useState([]);
@@ -11,41 +10,46 @@ export default function Watchlist() {
     setStocks(saved);
   }, []);
 
-  // DELETE A STOCK
-  function handleDelete(id) {
-    const updated = stocks.filter(stock => stock.id !== id);
+  function deleteStock(id) {
+    const updated = stocks.filter((s) => s.id !== id);
     setStocks(updated);
     localStorage.setItem("stocks", JSON.stringify(updated));
   }
 
+  const filtered = stocks.filter((s) => {
+    const q = search.toLowerCase();
+    return (
+      s.ticker.toLowerCase().includes(q) ||
+      s.nickname.toLowerCase().includes(q)
+    );
+  });
+
   return (
-  <div className="container">
-    <h2 className="text-white mb-4">Your Watchlist</h2>
+    <div className="container py-4 text-light">
+      <h2>Your Watchlist</h2>
 
-    <SearchBar search={search} setSearch={setSearch} />
-
-    {stocks.length === 0 ? (
-      <p className="text-secondary">No stocks added yet.</p>
-    ) : (
-      <div className="row">
-        {stocks
-          .filter(stock => {
-            const term = search.toLowerCase();
-            return (
-              stock.ticker.toLowerCase().includes(term) ||
-              stock.nickname.toLowerCase().includes(term)
-            );
-          })
-          .map(stock => (
-            <div className="col-md-4 mb-3" key={stock.id}>
-              <StockCard
-                stock={stock}
-                onDelete={handleDelete}
-              />
-            </div>
-          ))}
+      <div className="mb-4">
+        <input
+          type="text"
+          className="form-control bg-dark text-light border-secondary"
+          placeholder="Search by ticker or nickname..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
       </div>
-    )}
-  </div>
-);
+
+      <div className="row g-4">
+        {filtered.length === 0 ? (
+          <p>No stocks added yet.</p>
+        ) : (
+          filtered.map((stock) => (
+            <div className="col-md-4" key={stock.id}>
+              <StockCard stock={stock} deleteStock={deleteStock} />
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
 }
+
