@@ -8,3 +8,89 @@ footer {
   color: #bbb;
 }
 
+/* --- Stock Card Styling --- */
+.stock-card {
+  border-radius: 10px;
+  transition: all 0.25s ease-in-out;
+  border: 1px solid #2a2a2a;
+}
+
+.stock-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  border-color: #3a3a3a;
+}
+
+/* Button aesthetics */
+.stock-card .btn {
+  font-weight: 500;
+}
+
+/* Title spacing */
+.stock-card h4 {
+  margin-bottom: 4px;
+}
+
+/* --- CARD BASE STYLE --- */
+.stock-card {
+  border-radius: 12px;
+  transition: all 0.25s ease-in-out;
+  border: 1px solid #2f2f2f;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(145deg, #1a1c20, #111215);
+}
+
+/* Hover animation */
+.stock-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.45);
+  border-color: #3e3e3e;
+}
+
+/* Accent bar */
+.accent-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 100%;
+}
+
+/* Category colors */
+.accent-bar.stock {
+  background-color: #007bff;
+}
+
+.accent-bar.crypto {
+  background-color: #9b59b6;
+}
+
+.accent-bar.etf {
+  background-color: #2ecc71;
+}
+
+/* Target hit highlight */
+.target-hit {
+  border-color: #27ae60 !important;
+  box-shadow: 0px 0px 20px rgba(39, 174, 96, 0.4) !important;
+}
+
+.target-hit h4::after {
+  content: "✔";
+  color: #2ecc71;
+  margin-left: 8px;
+}
+
+/* Delete button shake */
+.delete-btn:hover {
+  animation: shake 0.25s linear infinite;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  50% { transform: translateX(2px); }
+  75% { transform: translateX(-2px); }
+  100% { transform: translateX(0); }
+}
