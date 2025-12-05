@@ -5,11 +5,16 @@ export default function Watchlist() {
   const [stocks, setStocks] = useState([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("stocks");
-    if (saved) {
-      setStocks(JSON.parse(saved));
-    }
+    const saved = JSON.parse(localStorage.getItem("stocks")) || [];
+    setStocks(saved);
   }, []);
+
+  // DELETE A STOCK
+  function handleDelete(id) {
+    const updated = stocks.filter(stock => stock.id !== id);
+    setStocks(updated);
+    localStorage.setItem("stocks", JSON.stringify(updated));
+  }
 
   return (
     <div className="container">
@@ -21,7 +26,10 @@ export default function Watchlist() {
         <div className="row">
           {stocks.map(stock => (
             <div className="col-md-4 mb-3" key={stock.id}>
-              <StockCard stock={stock} />
+              <StockCard 
+                stock={stock} 
+                onDelete={handleDelete}
+              />
             </div>
           ))}
         </div>
@@ -29,4 +37,5 @@ export default function Watchlist() {
     </div>
   );
 }
+
 

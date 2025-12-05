@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-export default function StockCard({ stock }) {
+export default function StockCard({ stock, onDelete }) {
   return (
     <div className="card bg-dark text-light p-3 border-secondary">
       <h4>{stock.ticker}</h4>
@@ -18,7 +18,10 @@ export default function StockCard({ stock }) {
           Edit
         </Link>
 
-        <button className="btn btn-danger btn-sm">
+        <button 
+            className="btn btn-danger btn-sm"
+            onClick={() => onDelete(stock.id)}
+        >
           Delete
         </button>
       </div>
