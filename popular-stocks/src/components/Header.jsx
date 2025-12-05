@@ -9,10 +9,13 @@ export default function Header() {
 
       <div className="ms-auto">
         <Link to="/watchlist" className="btn btn-outline-light me-3">
-          Watchlist
+            <i className="fa-solid fa-list me-2"></i>
+            Watchlist
         </Link>
+
         <Link to="/add" className="btn btn-primary">
-          Add Stock
+            <i className="fa-solid fa-plus me-2"></i>
+            Add Stock
         </Link>
       </div>
     </nav>

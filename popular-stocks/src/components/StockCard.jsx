@@ -15,16 +15,18 @@ export default function StockCard({ stock, onDelete }) {
 
       <div className="mt-3 d-flex justify-content-between">
         <Link to={`/edit/${stock.id}`} className="btn btn-warning btn-sm">
-          Edit
+            <i className="fa-solid fa-pen-to-square me-2"></i>
+            Edit
         </Link>
 
         <button 
             className="btn btn-danger btn-sm"
             onClick={() => onDelete(stock.id)}
         >
-          Delete
+            <i className="fa-solid fa-trash me-2"></i>
+            Delete
         </button>
-      </div>
+    </div>
     </div>
   );
 }
