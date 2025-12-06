@@ -1,52 +1,11 @@
 import { useEffect, useState } from "react";
 
-const API_KEY = "d4pljl1r01qjpnb03esgd4pljl1r01qjpnb03et0";
-
-export default function MarketCard({ title, symbol }) {
+export default function MarketCard({ title, ticker, isCrypto = false }) {
   const [price, setPrice] = useState(null);
-  const [error, setError] = useState(false);
+  const [percent, setPercent] = useState(null);
+  const [change, setChange] = useState(null);
 
-  // Detect crypto tickers like BTC-USD or ETH-USD
-  const isCrypto = symbol.includes("-USD");
-
-  async function fetchStockPrice() {
-    try {
-      const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${API_KEY}`;
-      const res = await fetch(url);
-      const data = await res.json();
-
-      if (!data.c || data.c === 0) {
-        setError(true);
-        return;
-      }
-
-      setPrice(data.c);
-    } catch (err) {
-      console.error("Finnhub error:", err);
-      setError(true);
-    }
-  }
-
-  async function fetchCryptoPrice() {
-    try {
-      // Convert ETH-USD → ETHUSDT for Binance format
-      const binanceSymbol = symbol.replace("-USD", "USDT");
-
-      const url = `https://api.binance.com/api/v3/ticker/price?symbol=${binanceSymbol}`;
-      const res = await fetch(url);
-      const data = await res.json();
-
-      if (!data.price) {
-        setError(true);
-        return;
-      }
-
-      setPrice(parseFloat(data.price));
-    } catch (err) {
-      console.error("Binance error:", err);
-      setError(true);
-    }
-  }
+  const API_KEY = "d4pljl1r01qjpnb03esgd4pljl1r01qjpnb03et0";
 
   useEffect(() => {
     if (isCrypto) {
@@ -54,34 +13,104 @@ export default function MarketCard({ title, symbol }) {
     } else {
       fetchStockPrice();
     }
+  }, []);
 
-    // Auto-refresh every 20 seconds
-    const interval = setInterval(() => {
-      if (isCrypto) {
-        fetchCryptoPrice();
-      } else {
-        fetchStockPrice();
+  // -------------------------
+  // FETCH STOCK PRICE (FINNHUB)
+  // -------------------------
+  async function fetchStockPrice() {
+    try {
+      const url = `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${API_KEY}`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (!data || !data.c) {
+        console.warn("MarketCard API returned unexpected data:", data);
+        return;
       }
-    }, 20000);
 
-    return () => clearInterval(interval);
-  }, [symbol]);
+      const current = data.c;
+      const diff = data.c - data.pc;
+      const pct = (diff / data.pc) * 100;
+
+      setPrice(current);
+      setChange(diff);
+      setPercent(pct);
+    } catch (err) {
+      console.error("Stock API error:", err);
+    }
+  }
+
+  // -------------------------
+  // FETCH CRYPTO (FALLBACK MOCK)
+  // -------------------------
+  async function fetchCryptoPrice() {
+    try {
+      // Mock fallback for dashboard demonstration
+      const mockPrices = {
+        BTCUSD: { price: 48000, change: 120, percent: 0.25 },
+        ETHUSD: { price: 2500, change: -15, percent: -0.60 },
+      };
+
+      const key = ticker.replace("-", "").toUpperCase(); // BTC-USD → BTCUSD
+      const asset = mockPrices[key];
+
+      if (!asset) {
+        console.warn("Crypto fallback unavailable:", ticker);
+        setPrice(0);
+        setChange(null);
+        setPercent(null);
+        return;
+      }
+
+      setPrice(asset.price);
+      setChange(asset.change);
+      setPercent(asset.percent);
+    } catch (err) {
+      console.error("Crypto price error:", err);
+    }
+  }
+
+  // -------------------------
+  // FIX NaN or undefined values
+  // -------------------------
+  const safePrice = price ?? 0;
+
+  const safePercent =
+    percent !== null && !isNaN(percent) ? percent : null;
+
+  const safeChange =
+    change !== null && !isNaN(change) ? change : null;
+
+  const trendColor =
+    safePercent === null ? "gray" : safePercent >= 0 ? "lime" : "red";
 
   return (
-    <div className="card p-4 bg-dark border-secondary text-light mb-3">
-      <h5>{title}</h5>
-      <p className="text-muted">{symbol}</p>
+    <div
+      className="p-3 mb-3 rounded bg-dark text-light"
+      style={{ border: "1px solid rgba(255,255,255,0.1)" }}
+    >
+      <h5 className="mb-1">{title}</h5>
+      <small className="text-muted">{ticker}</small>
 
-      {price && !error ? (
-        <h3>${price.toFixed(2)}</h3>
-      ) : (
-        <div>
-          <h3>$N/A</h3>
-          <p className="text-danger small">
+      <div className="mt-2">
+        <h4>${safePrice.toLocaleString()}</h4>
+
+        {/* % Change Section */}
+        {safePercent !== null ? (
+          <div style={{ color: trendColor }}>
+            {safePercent >= 0 ? "+" : ""}
+            {safePercent.toFixed(2)}%{" "}
+            ({safeChange >= 0 ? "+" : ""}
+            {safeChange?.toFixed(2)})
+          </div>
+        ) : (
+          <div className="text-danger">
             Live price unavailable — using fallback.
-          </p>
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
+

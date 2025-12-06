@@ -1,18 +1,23 @@
 export default function LosersList() {
   const losers = [
-    { symbol: "NVDA", pct: -1.24 },
-    { symbol: "AMZN", pct: -0.92 },
-    { symbol: "META", pct: -0.71 },
+    { symbol: "META", pct: -1.28 },
+    { symbol: "NFLX", pct: -0.94 },
+    { symbol: "AMZN", pct: -2.31 },
   ];
 
   return (
-    <div className="p-3 rounded" style={{ background: "#111" }}>
-      <h4 className="text-light mb-3">Top Losers</h4>
-
-      {losers.map(l => (
-        <div key={l.symbol} className="d-flex justify-content-between py-2">
-          <span className="text-light">{l.symbol}</span>
-          <span style={{ color: "#FF3B30" }}>{l.pct}%</span>
+    <div className="mt-3">
+      {losers.map((l) => (
+        <div
+          key={l.symbol}
+          className="d-flex justify-content-between p-2 mb-2 rounded bg-dark text-danger"
+          style={{
+            border: "1px solid rgba(255,0,0,0.2)",
+            fontSize: "0.9rem",
+          }}
+        >
+          <span>{l.symbol}</span>
+          <span>{l.pct}%</span>
         </div>
       ))}
     </div>
