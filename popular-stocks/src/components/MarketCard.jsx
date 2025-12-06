@@ -1,55 +1,62 @@
 import { useEffect, useState } from "react";
 
-const API_KEY = "d4p1lj1r01qjpnb03esgd4plj1r01qjpnb03et0";
+// Your Finnhub API key
+const API_KEY = "d4pljl1r01qjpnb03esgd4pljl1r01qjpnb03et0";
 
-export default function MarketCard({ symbol, name }) {
+export default function MarketCard({ title, symbol, subtitle }) {
   const [price, setPrice] = useState(null);
-  const [changePercent, setChangePercent] = useState(null);
+  const [error, setError] = useState(false);
 
-  useEffect(() => {
-    fetchQuote();
-    const interval = setInterval(fetchQuote, 15000);
-    return () => clearInterval(interval);
-  }, [symbol]);
-
-  async function fetchQuote() {
+  async function loadPrice() {
     try {
-      const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${API_KEY}`;
-      const res = await fetch(url);
+      const res = await fetch(
+        `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${API_KEY}`
+      );
+
       const data = await res.json();
 
-      if (!data.c) return;
-
-      const pct = ((data.c - data.pc) / data.pc) * 100;
+      // If Finnhub returns an error object instead of price data
+      if (!data.c) {
+        console.warn("MarketCard API returned unexpected data:", data);
+        setError(true);
+        setPrice("N/A");
+        return;
+      }
 
       setPrice(data.c);
-      setChangePercent(pct);
+      setError(false);
     } catch (err) {
-      console.error("MarketCard error:", err);
+      console.error("MarketCard fetch error:", err);
+      setError(true);
+      setPrice("N/A");
     }
   }
 
-  const isUp = changePercent > 0;
-  const color = isUp ? "#00C805" : "#FF3B30";
+  useEffect(() => {
+    loadPrice();
+
+    // Auto-refresh every 20 seconds
+    const interval = setInterval(loadPrice, 20000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div
-      className="p-3 rounded shadow-sm"
-      style={{
-        background: "#111",
-        border: `1px solid ${color}40`,
-        minWidth: "180px",
-      }}
-    >
-      <h5 className="text-light mb-1">{name}</h5>
-      <p className="text-secondary">{symbol}</p>
+    <div className="card bg-dark text-light p-3 mb-3 shadow-sm border rounded">
+      <h5 className="mb-1">{title}</h5>
+      <div className="text-muted small">{subtitle}</div>
 
-      <h3 className="text-light mb-0">${price ? price.toFixed(2) : "…"}</h3>
+      <div className="mt-3">
+        {price === null ? (
+          <h3>$...</h3>
+        ) : (
+          <h3>${price}</h3>
+        )}
+      </div>
 
-      {changePercent !== null && (
-        <p style={{ color }}>
-          {isUp ? "▲" : "▼"} {changePercent.toFixed(2)}%
-        </p>
+      {error && (
+        <div className="text-danger small mt-2">
+          Live price unavailable — using fallback.
+        </div>
       )}
     </div>
   );
