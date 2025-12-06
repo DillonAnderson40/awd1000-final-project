@@ -1,65 +1,98 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Sparklines, SparklinesLine } from "react-sparklines";
 
-const API_KEY = "d4pljl1r01qjpnb03esgd4pljl1r01qjpnb03et0"; // your key
+// FINNHUB API KEY
+const FINNHUB_KEY = "d4pljl1r01qjpnb03esgd4pljl1r01qjpnb03et0";
 
 export default function MarketCard({ title, symbol }) {
-  const [price, setPrice] = useState(null);
-  const [change, setChange] = useState(null);
-  const [percent, setPercent] = useState(null);
+  const [price, setPrice] = useState(0);
+  const [change, setChange] = useState(0);
+  const [history, setHistory] = useState([]);
 
   useEffect(() => {
-    if (!symbol) return;
-    fetchFinnhub();
-  }, [symbol]);
+    fetchData();
+  }, []);
 
-  async function fetchFinnhub() {
+  async function fetchData() {
     try {
-      const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${API_KEY}`;
-      const res = await fetch(url);
+      let current = 0;
+      let previous = 0;
 
-      if (!res.ok) {
-        console.error("Finnhub error:", res.status);
-        return;
+      // -------------------------------------
+      // 1) STOCKS + ETFs  (Finnhub Quote only)
+      // -------------------------------------
+      if (!symbol.startsWith("BINANCE:")) {
+        const res = await fetch(
+          `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_KEY}`
+        );
+        const data = await res.json();
+
+        current = data.c || 0;
+        previous = data.pc || 0;
+
+        setPrice(current);
+        setChange(previous ? ((current - previous) / previous) * 100 : 0);
+
+        // Stocks DO NOT get sparklines → empty
+        setHistory([]);
       }
 
-      const data = await res.json();
+      // -------------------------------------
+      // 2) CRYPTO (Finnhub Candle API)
+      // -------------------------------------
+      else {
+        const url = `https://finnhub.io/api/v1/crypto/candle?symbol=${symbol}&resolution=D&count=14&token=${FINNHUB_KEY}`;
 
-      if (!data || !data.c) {
-        console.warn("Finnhub returned unexpected data:", data);
-        return;
+        const histRes = await fetch(url);
+        const hist = await histRes.json();
+
+        // Finnhub returns:
+        // { c: [], h: [], l: [], o: [], s: "ok", t: [] }
+        if (hist.s === "ok" && Array.isArray(hist.c)) {
+          const closes = hist.c;
+
+          setHistory(closes);
+
+          current = closes[closes.length - 1];
+          previous = closes[closes.length - 2];
+
+          setPrice(current);
+          setChange(previous ? ((current - previous) / previous) * 100 : 0);
+        } else {
+          console.warn("Bad Finnhub crypto response:", hist);
+          setHistory([]);
+        }
       }
-
-      setPrice(data.c);       // current price
-      setChange(data.d);      // difference
-      setPercent(data.dp);    // percent
     } catch (err) {
-      console.error("Failed to fetch Finnhub:", err);
+      console.error("MarketCard error:", err);
     }
   }
 
-  const trendColor = percent >= 0 ? "#4caf50" : "#ff5252";
-
   return (
-    <div
-      className="p-3 mb-3 rounded bg-dark text-light"
-      style={{ border: "1px solid rgba(255,255,255,0.15)" }}
-    >
-      <h5 className="mb-1">{title}</h5>
-      <small className="text-muted">{symbol}</small>
-
-      <div className="mt-2">
-        <h4>${price?.toLocaleString() ?? "0"}</h4>
-
-        {percent != null ? (
-          <div style={{ color: trendColor }}>
-            {percent >= 0 ? "+" : ""}
-            {percent?.toFixed(2)}% ({change >= 0 ? "+" : ""}
-            {change?.toFixed(2)})
-          </div>
-        ) : (
-          <div className="text-danger">Live price unavailable — using fallback.</div>
-        )}
+    <div className="market-card">
+      <div className="card-header">
+        <h3 className="card-title">{title}</h3>
+        <p className="card-price">${price.toLocaleString()}</p>
+        <p className={`card-change ${change >= 0 ? "green" : "red"}`}>
+          {change >= 0 ? "+" : ""}
+          {change.toFixed(2)}%
+        </p>
       </div>
+
+      {/* CRYPTO SPARKLINE ONLY */}
+      {history.length > 0 && (
+        <div className="sparkline-wrapper">
+          <Sparklines data={history} width={140} height={60} margin={5}>
+            <SparklinesLine
+              color={change >= 0 ? "#4caf50" : "#ff4444"}
+              style={{
+                strokeWidth: 2.5,
+                fill: change >= 0 ? "rgba(76, 175, 80, 0.18)" : "rgba(255, 68, 68, 0.18)",
+              }}
+            />
+          </Sparklines>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,0 +1,24 @@
+{
+  "name": "awd1000-final-project",
+  "version": "1.0.0",
+  "description": "AWD 1000 Final Project - React CRUD Application",
+"main": "index.js",
+"scripts": {
+  "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix popular-stocks\""
+},
+"repository": {
+    "type": "git",
+    "url": "git+https://github.com/DillonAnderson40/awd1000-final-project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/DillonAnderson40/awd1000-final-project/issues"
+  },
+  "homepage": "https://github.com/DillonAnderson40/awd1000-final-project#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

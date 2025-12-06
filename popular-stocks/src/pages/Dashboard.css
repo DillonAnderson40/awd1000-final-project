@@ -1,0 +1,163 @@
+/* WRAPPER — full page width */
+.dashboard-wrapper {
+  width: 100%;
+  padding: 40px 60px;
+}
+
+/* TITLE */
+.dashboard-title {
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+/* GRID — equal spacing + full width */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;   /* TWO EVEN COLUMNS */
+  gap: 50px;
+  width: 100%;
+}
+
+/* LEFT + RIGHT COLUMN */
+.left-column,
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* FIX THE CARD WIDTH — make them responsive instead of fixed */
+.left-column .card,
+.right-column .card,
+.market-card {
+  width: 100%;        /* ← THIS IS THE MAGIC FIX */
+  max-width: 100%;    /* ← stops shrinking */
+}
+
+/* NEWS SECTION — full width row */
+.news-section {
+  grid-column: 1 / -1;   /* span all columns */
+  margin-top: 60px;
+}
+
+/* RESPONSIVE BREAKPOINT */
+@media (max-width: 900px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;   /* stack */
+  }
+}
+
+.sparkline-wrapper {
+  margin-top: 10px;
+  padding: 5px 0;
+}
+
+.market-card {
+  background: #1b1f24;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #222;
+  transition: 0.2s ease;
+}
+
+.market-card:hover {
+  transform: translateY(-2px);
+  border-color: #333;
+}
+
+.price {
+  font-size: 1.3rem;
+  margin-top: 8px;
+}
+
+.up {
+  color: #4caf50;
+}
+
+.down {
+  color: #ff4d4d;
+}
+
+/* MARKET CARD */
+.market-card {
+  background: #1a1d23;
+  padding: 18px 22px;
+  border-radius: 10px;
+  border: 1px solid #222;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+/* Header text */
+.card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.card-price {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.card-change {
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+}
+
+/* Sparkline wrapper */
+.sparkline-wrapper {
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* ==========================================
+   ROBINHOOD SPARKLINE STYLING
+   ========================================== */
+
+.sparkline-wrapper {
+  width: 100%;
+  margin-top: 8px;
+  padding-bottom: 5px;
+}
+
+.sparkline-wrapper svg {
+  filter: drop-shadow(0px 0px 3px rgba(0, 255, 0, 0.25));
+}
+
+/* Override shadow color for negative values */
+.red + .sparkline-wrapper svg {
+  filter: drop-shadow(0px 0px 3px rgba(255, 0, 0, 0.25));
+}
+
+/* Market Card (Robinhood aesthetic) */
+.market-card {
+  background: #1a1d23;
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  border: 1px solid #262a33;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.market-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.45);
+}
+
+/* Price & Percentage */
+.market-card .price {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-top: 5px;
+}
+
+.market-card .green {
+  color: #4caf50 !important;
+}
+
+.market-card .red {
+  color: #ff4d4d !important;
+}
