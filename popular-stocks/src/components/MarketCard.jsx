@@ -1,108 +1,65 @@
 import { useEffect, useState } from "react";
 
-export default function MarketCard({ title, ticker, isCrypto = false }) {
+export default function MarketCard({ title, ticker }) {
   const [price, setPrice] = useState(null);
-  const [percent, setPercent] = useState(null);
   const [change, setChange] = useState(null);
-
-  const API_KEY = "d4pljl1r01qjpnb03esgd4pljl1r01qjpnb03et0";
+  const [percent, setPercent] = useState(null);
 
   useEffect(() => {
-    if (isCrypto) {
-      fetchCryptoPrice();
-    } else {
-      fetchStockPrice();
-    }
-  }, []);
+    if (!ticker) return;
+    fetchYahoo();
+  }, [ticker]);
 
-  // -------------------------
-  // FETCH STOCK PRICE (FINNHUB)
-  // -------------------------
-  async function fetchStockPrice() {
+  async function fetchYahoo() {
     try {
-      const url = `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${API_KEY}`;
-      const res = await fetch(url);
-      const data = await res.json();
+      const url = `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${ticker}?modules=price`;
 
-      if (!data || !data.c) {
-        console.warn("MarketCard API returned unexpected data:", data);
+      const res = await fetch(url);
+
+      if (!res.ok) {
+        console.error("Yahoo error:", res.status);
         return;
       }
 
-      const current = data.c;
-      const diff = data.c - data.pc;
-      const pct = (diff / data.pc) * 100;
+      const json = await res.json();
+      const quote = json?.quoteSummary?.result?.[0]?.price;
 
-      setPrice(current);
+      if (!quote) {
+        console.warn("Yahoo returned no price data:", json);
+        return;
+      }
+
+      const marketPrice = quote.regularMarketPrice?.raw ?? 0;
+      const diff = quote.regularMarketChange?.raw ?? 0;
+      const pct = quote.regularMarketChangePercent?.raw ?? 0;
+
+      setPrice(marketPrice);
       setChange(diff);
       setPercent(pct);
     } catch (err) {
-      console.error("Stock API error:", err);
+      console.error("Yahoo fetch failed:", err);
     }
   }
-
-  // -------------------------
-  // FETCH CRYPTO (FALLBACK MOCK)
-  // -------------------------
-  async function fetchCryptoPrice() {
-    try {
-      // Mock fallback for dashboard demonstration
-      const mockPrices = {
-        BTCUSD: { price: 48000, change: 120, percent: 0.25 },
-        ETHUSD: { price: 2500, change: -15, percent: -0.60 },
-      };
-
-      const key = ticker.replace("-", "").toUpperCase(); // BTC-USD → BTCUSD
-      const asset = mockPrices[key];
-
-      if (!asset) {
-        console.warn("Crypto fallback unavailable:", ticker);
-        setPrice(0);
-        setChange(null);
-        setPercent(null);
-        return;
-      }
-
-      setPrice(asset.price);
-      setChange(asset.change);
-      setPercent(asset.percent);
-    } catch (err) {
-      console.error("Crypto price error:", err);
-    }
-  }
-
-  // -------------------------
-  // FIX NaN or undefined values
-  // -------------------------
-  const safePrice = price ?? 0;
-
-  const safePercent =
-    percent !== null && !isNaN(percent) ? percent : null;
-
-  const safeChange =
-    change !== null && !isNaN(change) ? change : null;
 
   const trendColor =
-    safePercent === null ? "gray" : safePercent >= 0 ? "lime" : "red";
+    percent === null ? "gray" : percent >= 0 ? "#4caf50" : "#ff5252";
 
   return (
     <div
       className="p-3 mb-3 rounded bg-dark text-light"
-      style={{ border: "1px solid rgba(255,255,255,0.1)" }}
+      style={{ border: "1px solid rgba(255,255,255,0.12)" }}
     >
       <h5 className="mb-1">{title}</h5>
       <small className="text-muted">{ticker}</small>
 
       <div className="mt-2">
-        <h4>${safePrice.toLocaleString()}</h4>
+        <h4>${price?.toLocaleString() ?? "0"}</h4>
 
-        {/* % Change Section */}
-        {safePercent !== null ? (
+        {percent !== null ? (
           <div style={{ color: trendColor }}>
-            {safePercent >= 0 ? "+" : ""}
-            {safePercent.toFixed(2)}%{" "}
-            ({safeChange >= 0 ? "+" : ""}
-            {safeChange?.toFixed(2)})
+            {percent >= 0 ? "+" : ""}
+            {percent.toFixed(2)}% ({change >= 0 ? "+" : ""}
+            {change?.toFixed(2)})
           </div>
         ) : (
           <div className="text-danger">

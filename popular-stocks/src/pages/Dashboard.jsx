@@ -13,11 +13,12 @@ export default function Dashboard() {
       {/* Market Overview */}
       <h4 className="mt-3">Market Overview</h4>
       <div className="row g-3 mb-4">
-        <MarketCard symbol="SPY" name="S&P 500" />
-        <MarketCard symbol="QQQ" name="NASDAQ 100" />
-        <MarketCard symbol="DIA" name="Dow Jones" />
-        <MarketCard symbol="BTC-USD" name="Bitcoin" />
-        <MarketCard symbol="ETH-USD" name="Ethereum" />
+        <MarketCard title="S&P 500" ticker="^GSPC" />
+        <MarketCard title="NASDAQ 100" ticker="^NDX" />
+        <MarketCard title="Dow Jones" ticker="^DJI" />
+        <MarketCard title="Bitcoin" ticker="BTC-USD" />
+        <MarketCard title="Ethereum" ticker="ETH-USD" />
+
       </div>
 
       {/* Movers */}
