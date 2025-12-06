@@ -14,15 +14,15 @@ export default function Dashboard() {
           <h2 className="section-title">Market Overview</h2>
 
           {/* ===== STOCK INDEX CARDS (Finnhub) ===== */}
-          <MarketCard title="S&P 500" symbol="^GSPC" />
-          <MarketCard title="NASDAQ 100" symbol="^NDX" />
-          <MarketCard title="Dow Jones" symbol="^DJI" />
+          <MarketCard title="S&P 500" symbol="SPY" />
+          <MarketCard title="NASDAQ 100" symbol="QQQ" />
+          <MarketCard title="Dow Jones" symbol="DIA" />
 
           {/* ===== CRYPTO CARDS (Binance proxy) ===== */}
-          <MarketCard title="Bitcoin" symbol="CRYPTO:BTCUSDT" />
-          <MarketCard title="Ethereum" symbol="CRYPTO:ETHUSDT" />
-          <MarketCard title="Solana" symbol="CRYPTO:SOLUSDT" />
-          <MarketCard title="Cardano" symbol="CRYPTO:ADAUSDT" />
+          <MarketCard title="Bitcoin" symbol="BINANCE:BTCUSDT" />
+          <MarketCard title="Ethereum" symbol="BINANCE:ETHUSDT" />
+          <MarketCard title="Solana" symbol="BINANCE:SOLUSDT" />
+          <MarketCard title="Cardano" symbol="BINANCE:ADAUSDT" />
         </div>
 
         {/* =============== RIGHT SIDE — GAINERS & LOSERS =============== */}
