@@ -1,63 +1,67 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Sparklines, SparklinesLine } from "react-sparklines";
 
-const API_KEY = "d4pljl1r01qjpnb03esgd4pljl1r01qjpnb03et0";
+export default function MarketCard({ title, symbol }) {
+  const [price, setPrice] = useState(0);
+  const [change, setChange] = useState(0);
+  const [history, setHistory] = useState([]);
 
-export default function NewsFeed() {
-  const [news, setNews] = useState([]);
-  const [error, setError] = useState(null);
+  useEffect(() => {
+    loadData();
+  }, []);
 
-  async function loadNews() {
+  async function loadData() {
     try {
-      const res = await fetch(
-        `https://finnhub.io/api/v1/news?category=general&token=${API_KEY}`
-      );
+      // Convert BINANCE:BTCUSDT → BTC-USD
+      let yahooSymbol = symbol;
+      if (symbol.startsWith("BINANCE:")) {
+        yahooSymbol = symbol.replace("BINANCE:", "").replace("USDT", "-USD");
+      }
 
+      const res = await fetch(`/chart?symbol=${yahooSymbol}`);
       const data = await res.json();
 
-      // Finnhub will return an object containing error text if API key is invalid or rate-limited
-      if (!Array.isArray(data)) {
-        console.warn("News API returned unexpected data:", data);
-        setError("Live news unavailable. Showing mock articles.");
-        setNews([
-          {
-            headline: "Market steady amid investor optimism",
-            datetime: Date.now(),
-            source: "MockFeed",
-          },
-          {
-            headline: "Tech stocks show early gains",
-            datetime: Date.now(),
-            source: "MockFeed",
-          },
-          {
-            headline: "Crypto rebounds after mild selloff",
-            datetime: Date.now(),
-            source: "MockFeed",
-          },
-        ]);
+      if (!data || !data.history) {
+        console.warn("Invalid chart response:", data);
         return;
       }
 
-      setNews(data.slice(0, 3));
+      setPrice(data.current || 0);
+
+      const pct =
+        data.previous && data.current
+          ? ((data.current - data.previous) / data.previous) * 100
+          : 0;
+
+      setChange(pct);
+      setHistory(data.history);
     } catch (err) {
-      console.error("News error:", err);
-      setError("News unavailable.");
+      console.error("MarketCard error:", err);
     }
   }
 
-  useEffect(() => {
-    loadNews();
-  }, []);
-
   return (
-    <div className="card bg-dark text-light p-3">
-      <h5>News</h5>
-      {news.map((n, i) => (
-        <div key={i} className="mb-2">
-          <strong>{n.headline}</strong>
-          <div className="text-muted">{n.source}</div>
+    <div className="market-card">
+      <h3 className="card-title">{title}</h3>
+      <p className="card-price">${price.toLocaleString()}</p>
+
+      <p className={`card-change ${change >= 0 ? "green" : "red"}`}>
+        {change >= 0 ? "+" : ""}
+        {change.toFixed(2)}%
+      </p>
+
+      {/* Sparkline */}
+      {history.length > 0 && (
+        <div className="sparkline-wrapper">
+          <Sparklines data={history} width={160} height={50} margin={5}>
+            <SparklinesLine
+              color={change >= 0 ? "#4caf50" : "#ff4d4d"}
+              style={{ strokeWidth: 3 }}
+            />
+          </Sparklines>
         </div>
-      ))}
+      )}
     </div>
   );
 }
+

@@ -9,13 +9,11 @@ export default defineConfig({
         target: "http://localhost:5000",
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/binance/, ""), 
       },
       "/spark": {
         target: "http://localhost:5000",
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/spark/, ""), 
       },
     },
   },
