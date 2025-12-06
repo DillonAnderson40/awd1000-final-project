@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Sparklines, SparklinesLine } from "react-sparklines";
 
+// Finnhub API KEY
 const FINNHUB_KEY = "d4pljl1r01qjpnb03esgd4pljl1r01qjpnb03et0";
 
 export default function MarketCard({ title, symbol }) {
@@ -17,31 +18,58 @@ export default function MarketCard({ title, symbol }) {
       let current = 0;
       let previous = 0;
 
-      /* ===============================================
-         1) PRICE — Finnhub supports crypto & stocks
-      =============================================== */
-      const quoteRes = await fetch(
-        `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_KEY}`
-      );
-      const q = await quoteRes.json();
+      /* ======================================================
+         A) STOCKS — FINNHUB PRICE + YAHOO SPARKLINE
+      ====================================================== */
+      if (!symbol.startsWith("YAHOO:")) {
+        // ----- Price -----
+        const quote = await fetch(
+          `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_KEY}`
+        );
+        const q = await quote.json();
 
-      current = q.c || 0;
-      previous = q.pc || 0;
+        current = q.c || 0;
+        previous = q.pc || 0;
 
-      setPrice(current);
-      setChange(previous ? ((current - previous) / previous) * 100 : 0);
+        setPrice(current);
+        setChange(previous ? ((current - previous) / previous) * 100 : 0);
 
-      /* ===============================================
-         2) SPARKLINE — Yahoo Finance (via backend proxy)
-      =============================================== */
-      const sparkRes = await fetch(`/spark?symbol=${symbol}`);
-      const sparkData = await sparkRes.json();
+        // ----- Sparkline (Yahoo) -----
+        const sparkRes = await fetch(`/spark?symbol=${symbol}`);
+        const spark = await sparkRes.json();
 
-      if (Array.isArray(sparkData)) {
-        setHistory(sparkData.filter((v) => v !== null));
-      } else {
-        console.warn("Spark invalid:", sparkData);
-        setHistory([]);
+        if (Array.isArray(spark)) {
+          setHistory(spark.filter((v) => v !== null));
+        } else {
+          console.warn("Yahoo spark invalid:", spark);
+          setHistory([]);
+        }
+      }
+
+      /* ======================================================
+         B) CRYPTO — YAHOO PRICE + YAHOO SPARKLINE
+            (example: YAHOO:BTC-USD)
+      ====================================================== */
+      else if (symbol.startsWith("YAHOO:")) {
+        const pair = symbol.replace("YAHOO:", "");
+
+        // ----- Sparkline -----
+        const histRes = await fetch(`/spark?symbol=${pair}`);
+        const hist = await histRes.json();
+
+        if (Array.isArray(hist)) {
+          const closes = hist.filter((v) => v !== null);
+
+          current = closes[closes.length - 1];
+          previous = closes[closes.length - 2];
+
+          setPrice(current);
+          setChange(previous ? ((current - previous) / previous) * 100 : 0);
+          setHistory(closes);
+        } else {
+          console.warn("Yahoo crypto invalid:", hist);
+          setHistory([]);
+        }
       }
     } catch (err) {
       console.error("MarketCard error:", err);
@@ -50,13 +78,16 @@ export default function MarketCard({ title, symbol }) {
 
   return (
     <div className="market-card">
-      <h3 className="card-title">{title}</h3>
-      <p className="card-price">${price.toLocaleString()}</p>
-      <p className={`card-change ${change >= 0 ? "green" : "red"}`}>
-        {change >= 0 ? "+" : ""}
-        {change.toFixed(2)}%
-      </p>
+      <div>
+        <h3 className="card-title">{title}</h3>
+        <p className="card-price">${price.toLocaleString()}</p>
+        <p className={`card-change ${change >= 0 ? "green" : "red"}`}>
+          {change >= 0 ? "+" : ""}
+          {change.toFixed(2)}%
+        </p>
+      </div>
 
+      {/* Sparkline */}
       {history.length > 0 && (
         <div className="sparkline-wrapper">
           <Sparklines data={history} width={120} height={40} margin={5}>

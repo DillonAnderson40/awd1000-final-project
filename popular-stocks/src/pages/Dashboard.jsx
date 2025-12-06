@@ -19,10 +19,10 @@ export default function Dashboard() {
           <MarketCard title="Dow Jones" symbol="DIA" />
 
           {/* ===== CRYPTO (Yahoo Format) ===== */}
-          <MarketCard title="Bitcoin" symbol="BTC-USD" />
-          <MarketCard title="Ethereum" symbol="ETH-USD" />
-          <MarketCard title="Solana" symbol="SOL-USD" />
-          <MarketCard title="Cardano" symbol="ADA-USD" />
+          <MarketCard title="Bitcoin" symbol="YAHOO:BTC-USD" />
+          <MarketCard title="Ethereum" symbol="YAHOO:ETH-USD" />
+          <MarketCard title="Solana" symbol="YAHOO:SOL-USD" />
+          <MarketCard title="Cardano" symbol="YAHOO:ADA-USD" />
         </div>
 
         {/* ================= RIGHT SIDE — GAINERS & LOSERS ================= */}
