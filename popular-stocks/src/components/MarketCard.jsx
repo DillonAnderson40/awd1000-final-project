@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Sparklines, SparklinesLine } from "react-sparklines";
 
-// Finnhub API KEY
 const FINNHUB_KEY = "d4pljl1r01qjpnb03esgd4pljl1r01qjpnb03et0";
 
 export default function MarketCard({ title, symbol }) {
@@ -18,57 +17,31 @@ export default function MarketCard({ title, symbol }) {
       let current = 0;
       let previous = 0;
 
-      /* ======================================================
-         A) STOCKS — FINNHUB PRICE + YAHOO SPARKLINE
-      ====================================================== */
-      if (!symbol.startsWith("BINANCE:")) {
-        /* ---- Price ---- */
-        const quote = await fetch(
-          `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_KEY}`
-        );
-        const q = await quote.json();
+      /* ===============================================
+         1) PRICE — Finnhub supports crypto & stocks
+      =============================================== */
+      const quoteRes = await fetch(
+        `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_KEY}`
+      );
+      const q = await quoteRes.json();
 
-        current = q.c || 0;
-        previous = q.pc || 0;
+      current = q.c || 0;
+      previous = q.pc || 0;
 
-        setPrice(current);
-        setChange(previous ? ((current - previous) / previous) * 100 : 0);
+      setPrice(current);
+      setChange(previous ? ((current - previous) / previous) * 100 : 0);
 
-        /* ---- Sparkline ---- */
-        const sparkRes = await fetch(`/spark?symbol=${symbol}`);
-        const sparkData = await sparkRes.json();
+      /* ===============================================
+         2) SPARKLINE — Yahoo Finance (via backend proxy)
+      =============================================== */
+      const sparkRes = await fetch(`/spark?symbol=${symbol}`);
+      const sparkData = await sparkRes.json();
 
-        if (Array.isArray(sparkData)) {
-          setHistory(sparkData.filter((v) => v !== null));
-        } else {
-          console.warn("Yahoo spark invalid:", sparkData);
-          setHistory([]);
-        }
-      }
-
-      /* ======================================================
-         B) CRYPTO — BINANCE PRICE + HISTORY
-      ====================================================== */
-      else {
-        const pair = symbol.replace("BINANCE:", "");
-
-        const histRes = await fetch(`/binance?symbol=${pair}&limit=14`);
-        const hist = await histRes.json();
-
-        if (Array.isArray(hist)) {
-          const closes = hist.map((row) => parseFloat(row[4]));
-
-          current = closes[closes.length - 1];
-          previous = closes[closes.length - 2];
-
-          setPrice(current);
-          setChange(previous ? ((current - previous) / previous) * 100 : 0);
-
-          setHistory(closes);
-        } else {
-          console.warn("Binance invalid response:", hist);
-          setHistory([]);
-        }
+      if (Array.isArray(sparkData)) {
+        setHistory(sparkData.filter((v) => v !== null));
+      } else {
+        console.warn("Spark invalid:", sparkData);
+        setHistory([]);
       }
     } catch (err) {
       console.error("MarketCard error:", err);
@@ -77,16 +50,13 @@ export default function MarketCard({ title, symbol }) {
 
   return (
     <div className="market-card">
-      <div>
-        <h3 className="card-title">{title}</h3>
-        <p className="card-price">${price.toLocaleString()}</p>
-        <p className={`card-change ${change >= 0 ? "green" : "red"}`}>
-          {change >= 0 ? "+" : ""}
-          {change.toFixed(2)}%
-        </p>
-      </div>
+      <h3 className="card-title">{title}</h3>
+      <p className="card-price">${price.toLocaleString()}</p>
+      <p className={`card-change ${change >= 0 ? "green" : "red"}`}>
+        {change >= 0 ? "+" : ""}
+        {change.toFixed(2)}%
+      </p>
 
-      {/* Sparkline for both stocks + crypto */}
       {history.length > 0 && (
         <div className="sparkline-wrapper">
           <Sparklines data={history} width={120} height={40} margin={5}>
