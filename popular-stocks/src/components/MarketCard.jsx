@@ -1,70 +1,63 @@
 import { useEffect, useState } from "react";
 
-export default function MarketCard({ title, ticker }) {
+const API_KEY = "d4pljl1r01qjpnb03esgd4pljl1r01qjpnb03et0"; // your key
+
+export default function MarketCard({ title, symbol }) {
   const [price, setPrice] = useState(null);
   const [change, setChange] = useState(null);
   const [percent, setPercent] = useState(null);
 
   useEffect(() => {
-    if (!ticker) return;
-    fetchYahoo();
-  }, [ticker]);
+    if (!symbol) return;
+    fetchFinnhub();
+  }, [symbol]);
 
-  async function fetchYahoo() {
+  async function fetchFinnhub() {
     try {
-      const url = `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${ticker}?modules=price`;
-
+      const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${API_KEY}`;
       const res = await fetch(url);
 
       if (!res.ok) {
-        console.error("Yahoo error:", res.status);
+        console.error("Finnhub error:", res.status);
         return;
       }
 
-      const json = await res.json();
-      const quote = json?.quoteSummary?.result?.[0]?.price;
+      const data = await res.json();
 
-      if (!quote) {
-        console.warn("Yahoo returned no price data:", json);
+      if (!data || !data.c) {
+        console.warn("Finnhub returned unexpected data:", data);
         return;
       }
 
-      const marketPrice = quote.regularMarketPrice?.raw ?? 0;
-      const diff = quote.regularMarketChange?.raw ?? 0;
-      const pct = quote.regularMarketChangePercent?.raw ?? 0;
-
-      setPrice(marketPrice);
-      setChange(diff);
-      setPercent(pct);
+      setPrice(data.c);       // current price
+      setChange(data.d);      // difference
+      setPercent(data.dp);    // percent
     } catch (err) {
-      console.error("Yahoo fetch failed:", err);
+      console.error("Failed to fetch Finnhub:", err);
     }
   }
 
-  const trendColor =
-    percent === null ? "gray" : percent >= 0 ? "#4caf50" : "#ff5252";
+  const trendColor = percent >= 0 ? "#4caf50" : "#ff5252";
 
   return (
     <div
       className="p-3 mb-3 rounded bg-dark text-light"
-      style={{ border: "1px solid rgba(255,255,255,0.12)" }}
+      style={{ border: "1px solid rgba(255,255,255,0.15)" }}
     >
       <h5 className="mb-1">{title}</h5>
-      <small className="text-muted">{ticker}</small>
+      <small className="text-muted">{symbol}</small>
 
       <div className="mt-2">
         <h4>${price?.toLocaleString() ?? "0"}</h4>
 
-        {percent !== null ? (
+        {percent != null ? (
           <div style={{ color: trendColor }}>
             {percent >= 0 ? "+" : ""}
-            {percent.toFixed(2)}% ({change >= 0 ? "+" : ""}
+            {percent?.toFixed(2)}% ({change >= 0 ? "+" : ""}
             {change?.toFixed(2)})
           </div>
         ) : (
-          <div className="text-danger">
-            Live price unavailable — using fallback.
-          </div>
+          <div className="text-danger">Live price unavailable — using fallback.</div>
         )}
       </div>
     </div>

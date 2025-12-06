@@ -1,43 +1,52 @@
-import { useEffect, useState } from "react";
+import React from "react";
 import MarketCard from "../components/MarketCard";
 import GainersList from "../components/GainersList";
 import LosersList from "../components/LosersList";
 import NewsFeed from "../components/NewsFeed";
-import WatchlistPreview from "../components/WatchlistPreview";
 
 export default function Dashboard() {
+  const marketSymbols = [
+    { symbol: "SPY", name: "S&P 500" },
+    { symbol: "QQQ", name: "NASDAQ 100" },
+    { symbol: "DIA", name: "Dow Jones" },
+    { symbol: "BTCUSDT", name: "Bitcoin" },
+    { symbol: "ETHUSDT", name: "Ethereum" },
+  ];
+
   return (
-    <div className="container text-light py-4">
-      <h2 className="mb-4">Dashboard - QuantShift</h2>
+    <div className="dashboard-container">
+      <h1>Dashboard - QuantShift</h1>
 
-      {/* Market Overview */}
-      <h4 className="mt-3">Market Overview</h4>
-      <div className="row g-3 mb-4">
-        <MarketCard title="S&P 500" ticker="^GSPC" />
-        <MarketCard title="NASDAQ 100" ticker="^NDX" />
-        <MarketCard title="Dow Jones" ticker="^DJI" />
-        <MarketCard title="Bitcoin" ticker="BTC-USD" />
-        <MarketCard title="Ethereum" ticker="ETH-USD" />
+      <div className="dashboard-grid">
+        {/* LEFT COLUMN */}
+        <section className="left-column">
+          <h2>Market Overview</h2>
 
-      </div>
+          {marketSymbols.map((item) => (
+            <MarketCard
+              key={item.symbol}
+              symbol={item.symbol}
+              name={item.name}
+            />
+          ))}
+        </section>
 
-      {/* Movers */}
-      <div className="row g-3">
-        <div className="col-md-6">
+        {/* RIGHT COLUMN */}
+        <section className="right-column">
+          <h2>Top Gainers</h2>
           <GainersList />
-        </div>
-        <div className="col-md-6">
+
+          <h2 style={{ marginTop: "2rem" }}>Top Losers</h2>
           <LosersList />
-        </div>
+        </section>
+
+        {/* FULL-WIDTH NEWS */}
+        <section className="news-section">
+          <h2>News</h2>
+          <NewsFeed />
+        </section>
       </div>
-
-      {/* Watchlist Preview */}
-      <h4 className="mt-5">Your Watchlist Overview</h4>
-      <WatchlistPreview />
-
-      {/* News */}
-      <h4 className="mt-5">Market News</h4>
-      <NewsFeed />
     </div>
   );
 }
+
