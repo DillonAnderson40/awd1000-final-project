@@ -9,23 +9,23 @@ export default function Dashboard() {
       <h1 className="dashboard-title">Dashboard — QuantShift</h1>
 
       <div className="dashboard-grid">
-        {/* =============== LEFT SIDE — MARKET OVERVIEW =============== */}
+        {/* ================= LEFT SIDE — MARKET OVERVIEW ================= */}
         <div className="market-overview-section">
           <h2 className="section-title">Market Overview</h2>
 
-          {/* ===== STOCK INDEX CARDS (Finnhub) ===== */}
+          {/* ===== MAJOR STOCK INDEX ETFs ===== */}
           <MarketCard title="S&P 500" symbol="SPY" />
           <MarketCard title="NASDAQ 100" symbol="QQQ" />
           <MarketCard title="Dow Jones" symbol="DIA" />
 
-          {/* ===== CRYPTO CARDS (Binance proxy) ===== */}
-          <MarketCard title="Bitcoin" symbol="BINANCE:BTCUSDT" />
-          <MarketCard title="Ethereum" symbol="BINANCE:ETHUSDT" />
-          <MarketCard title="Solana" symbol="BINANCE:SOLUSDT" />
-          <MarketCard title="Cardano" symbol="BINANCE:ADAUSDT" />
+          {/* ===== CRYPTO (Yahoo Format) ===== */}
+          <MarketCard title="Bitcoin" symbol="BTC-USD" />
+          <MarketCard title="Ethereum" symbol="ETH-USD" />
+          <MarketCard title="Solana" symbol="SOL-USD" />
+          <MarketCard title="Cardano" symbol="ADA-USD" />
         </div>
 
-        {/* =============== RIGHT SIDE — GAINERS & LOSERS =============== */}
+        {/* ================= RIGHT SIDE — GAINERS & LOSERS ================= */}
         <div className="gainers-losers-section">
           <div className="gainers-section">
             <h2 className="section-title">Top Gainers</h2>
