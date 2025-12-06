@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Sparklines, SparklinesLine } from "react-sparklines";
 
-// FINNHUB API KEY
+// Finnhub API key for current price
 const FINNHUB_KEY = "d4pljl1r01qjpnb03esgd4pljl1r01qjpnb03et0";
 
 export default function MarketCard({ title, symbol }) {
@@ -15,51 +15,57 @@ export default function MarketCard({ title, symbol }) {
 
   async function fetchData() {
     try {
-      let current = 0;
-      let previous = 0;
+      let curr = 0;
+      let prev = 0;
 
-      // -------------------------------------
-      // 1) STOCKS + ETFs  (Finnhub Quote only)
-      // -------------------------------------
+      /* =====================================================
+         STOCKS & ETFs — FINNHUB for price / YAHOO for sparkline
+      ===================================================== */
       if (!symbol.startsWith("BINANCE:")) {
+        // Get real-time stock price from Finnhub
         const res = await fetch(
           `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_KEY}`
         );
         const data = await res.json();
 
-        current = data.c || 0;
-        previous = data.pc || 0;
+        curr = data.c || 0;
+        prev = data.pc || 0;
 
-        setPrice(current);
-        setChange(previous ? ((current - previous) / previous) * 100 : 0);
+        setPrice(curr);
+        setChange(prev ? ((curr - prev) / prev) * 100 : 0);
 
-        // Stocks DO NOT get sparklines → empty
-        setHistory([]);
+        // Now get YAHOO sparkline through your backend proxy
+        const spark = await fetch(`/spark?symbol=${symbol}`);
+        const sparkData = await spark.json();
+
+        if (Array.isArray(sparkData)) {
+          setHistory(sparkData);
+        } else {
+          console.warn("Yahoo sparkline returned unexpected data:", sparkData);
+          setHistory([]);
+        }
       }
 
-      // -------------------------------------
-      // 2) CRYPTO (Finnhub Candle API)
-      // -------------------------------------
+      /* =====================================================
+         CRYPTO — Binance (through backend proxy)
+      ===================================================== */
       else {
-        const url = `https://finnhub.io/api/v1/crypto/candle?symbol=${symbol}&resolution=D&count=14&token=${FINNHUB_KEY}`;
+        const pair = symbol.replace("BINANCE:", "");
 
-        const histRes = await fetch(url);
-        const hist = await histRes.json();
+        const hist = await fetch(`/binance?symbol=${pair}&limit=7`);
+        const histData = await hist.json();
 
-        // Finnhub returns:
-        // { c: [], h: [], l: [], o: [], s: "ok", t: [] }
-        if (hist.s === "ok" && Array.isArray(hist.c)) {
-          const closes = hist.c;
+        if (Array.isArray(histData)) {
+          const closes = histData.map((row) => parseFloat(row[4]));
 
+          curr = closes[closes.length - 1];
+          prev = closes[closes.length - 2];
+
+          setPrice(curr);
+          setChange(prev ? ((curr - prev) / prev) * 100 : 0);
           setHistory(closes);
-
-          current = closes[closes.length - 1];
-          previous = closes[closes.length - 2];
-
-          setPrice(current);
-          setChange(previous ? ((current - previous) / previous) * 100 : 0);
         } else {
-          console.warn("Bad Finnhub crypto response:", hist);
+          console.warn("Binance invalid response:", histData);
           setHistory([]);
         }
       }
@@ -70,24 +76,23 @@ export default function MarketCard({ title, symbol }) {
 
   return (
     <div className="market-card">
-      <div className="card-header">
-        <h3 className="card-title">{title}</h3>
-        <p className="card-price">${price.toLocaleString()}</p>
-        <p className={`card-change ${change >= 0 ? "green" : "red"}`}>
-          {change >= 0 ? "+" : ""}
-          {change.toFixed(2)}%
-        </p>
-      </div>
+      <h3 className="card-title">{title}</h3>
 
-      {/* CRYPTO SPARKLINE ONLY */}
+      <p className="card-price">${price.toLocaleString()}</p>
+
+      <p className={`card-change ${change >= 0 ? "green" : "red"}`}>
+        {change >= 0 ? "+" : ""}
+        {change.toFixed(2)}%
+      </p>
+
+      {/* SPARKLINE — only shown if history exists */}
       {history.length > 0 && (
         <div className="sparkline-wrapper">
           <Sparklines data={history} width={140} height={60} margin={5}>
             <SparklinesLine
-              color={change >= 0 ? "#4caf50" : "#ff4444"}
+              color={change >= 0 ? "#4caf50" : "#ff4d4d"}
               style={{
-                strokeWidth: 2.5,
-                fill: change >= 0 ? "rgba(76, 175, 80, 0.18)" : "rgba(255, 68, 68, 0.18)",
+                strokeWidth: 2.6,
               }}
             />
           </Sparklines>

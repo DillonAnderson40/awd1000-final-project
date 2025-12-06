@@ -1,3 +1,7 @@
+/* =====================================================
+   DASHBOARD LAYOUT — FULL PAGE STRUCTURE
+   ===================================================== */
+
 /* WRAPPER — full page width */
 .dashboard-wrapper {
   width: 100%;
@@ -14,7 +18,7 @@
 /* GRID — equal spacing + full width */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;   /* TWO EVEN COLUMNS */
+  grid-template-columns: 1fr 1fr; /* Two equal columns */
   gap: 50px;
   width: 100%;
 }
@@ -27,112 +31,31 @@
   gap: 25px;
 }
 
-/* FIX THE CARD WIDTH — make them responsive instead of fixed */
+/* Make cards responsive */
 .left-column .card,
 .right-column .card,
 .market-card {
-  width: 100%;        /* ← THIS IS THE MAGIC FIX */
-  max-width: 100%;    /* ← stops shrinking */
+  width: 100%;
+  max-width: 100%;
 }
 
-/* NEWS SECTION — full width row */
+/* NEWS SECTION — full width */
 .news-section {
-  grid-column: 1 / -1;   /* span all columns */
+  grid-column: 1 / -1;
   margin-top: 60px;
 }
 
-/* RESPONSIVE BREAKPOINT */
+/* Responsiveness */
 @media (max-width: 900px) {
   .dashboard-grid {
-    grid-template-columns: 1fr;   /* stack */
+    grid-template-columns: 1fr; /* Stack columns */
   }
 }
 
-.sparkline-wrapper {
-  margin-top: 10px;
-  padding: 5px 0;
-}
+/* =====================================================
+   MARKET CARD — BASE STYLE (Robinhood Aesthetic)
+   ===================================================== */
 
-.market-card {
-  background: #1b1f24;
-  border-radius: 12px;
-  padding: 20px;
-  border: 1px solid #222;
-  transition: 0.2s ease;
-}
-
-.market-card:hover {
-  transform: translateY(-2px);
-  border-color: #333;
-}
-
-.price {
-  font-size: 1.3rem;
-  margin-top: 8px;
-}
-
-.up {
-  color: #4caf50;
-}
-
-.down {
-  color: #ff4d4d;
-}
-
-/* MARKET CARD */
-.market-card {
-  background: #1a1d23;
-  padding: 18px 22px;
-  border-radius: 10px;
-  border: 1px solid #222;
-  margin-bottom: 20px;
-  width: 100%;
-}
-
-/* Header text */
-.card-title {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-
-.card-price {
-  font-size: 1.4rem;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.card-change {
-  font-size: 0.9rem;
-  margin-bottom: 12px;
-}
-
-/* Sparkline wrapper */
-.sparkline-wrapper {
-  width: 100%;
-  margin-top: 8px;
-}
-
-/* ==========================================
-   ROBINHOOD SPARKLINE STYLING
-   ========================================== */
-
-.sparkline-wrapper {
-  width: 100%;
-  margin-top: 8px;
-  padding-bottom: 5px;
-}
-
-.sparkline-wrapper svg {
-  filter: drop-shadow(0px 0px 3px rgba(0, 255, 0, 0.25));
-}
-
-/* Override shadow color for negative values */
-.red + .sparkline-wrapper svg {
-  filter: drop-shadow(0px 0px 3px rgba(255, 0, 0, 0.25));
-}
-
-/* Market Card (Robinhood aesthetic) */
 .market-card {
   background: #1a1d23;
   border-radius: 14px;
@@ -140,6 +63,7 @@
   margin-bottom: 20px;
   border: 1px solid #262a33;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+  width: 100%;
 }
 
 .market-card:hover {
@@ -147,17 +71,51 @@
   box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.45);
 }
 
-/* Price & Percentage */
-.market-card .price {
-  font-size: 1.4rem;
+/* Title inside card */
+.card-title {
+  font-size: 1rem;
   font-weight: 600;
-  margin-top: 5px;
+  margin-bottom: 6px;
 }
 
-.market-card .green {
+/* Price inside card */
+.card-price,
+.price {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 5px 0;
+}
+
+/* Percentage change */
+.card-change {
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+}
+
+.green {
   color: #4caf50 !important;
 }
 
-.market-card .red {
+.red {
   color: #ff4d4d !important;
+}
+
+/* =====================================================
+   SPARKLINE AREA — ROBINHOOD STYLE
+   ===================================================== */
+
+.sparkline-wrapper {
+  width: 100%;
+  margin-top: 8px;
+  padding-bottom: 5px;
+}
+
+/* Green glow when positive */
+.sparkline-wrapper svg {
+  filter: drop-shadow(0px 0px 3px rgba(0, 255, 0, 0.25));
+}
+
+/* Red glow when negative */
+.red + .sparkline-wrapper svg {
+  filter: drop-shadow(0px 0px 3px rgba(255, 0, 0, 0.25));
 }
