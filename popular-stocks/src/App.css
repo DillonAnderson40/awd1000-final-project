@@ -1,158 +1,148 @@
-/* ------------------------------- */
-/*        GLOBAL DASHBOARD         */
-/* ------------------------------- */
+/* ========== PAGE BASE ========== */
+body {
+  background-color: #0e1117;
+  color: #ffffff;
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
 
 .dashboard-container {
-  padding: 2rem 3rem;
-  color: #ffffff;
   width: 100%;
+  max-width: 1400px;
+  margin: auto;
+  padding: 40px 20px;
 }
 
 /* Title */
-.dashboard-container h1 {
+h1 {
   font-size: 2.6rem;
+  margin-bottom: 30px;
   font-weight: 700;
-  margin-bottom: 1rem;
 }
 
-/* ------------------------------- */
-/*        GRID LAYOUT              */
-/* ------------------------------- */
+/* Section headers */
+h2 {
+  font-size: 1.6rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
 
+/* ========== GRID LAYOUT FIX ========== */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 1.3fr 1fr;   /* Left side slightly bigger */
-  gap: 2.5rem;
-  margin-top: 1.5rem;
+  grid-template-columns: 1fr 1fr;  /* two equal columns */
+  gap: 40px;
 }
 
-.left-column,
+/* Left column = market cards */
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Right column = gainers/losers */
 .right-column {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 20px;
 }
 
-/* ------------------------------- */
-/*         SECTION HEADERS         */
-/* ------------------------------- */
-
-.left-column h2,
-.right-column h2,
-.news-section h2 {
-  font-size: 1.75rem;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-}
-
-/* ------------------------------- */
-/*          NEWS SECTION           */
-/* ------------------------------- */
-
+/* News takes full width */
 .news-section {
-  grid-column: 1 / 3; /* Span across both columns */
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 12px;
-  padding: 1.5rem 2rem;
-  margin-top: 1rem;
+  grid-column: span 2;
+  margin-top: 30px;
 }
 
-.news-section h2 {
-  margin-bottom: 1rem;
+/* ========== CARD STYLING ========== */
+.market-card,
+.gainer-card,
+.loser-card,
+.news-box {
+  background-color: #1a1f24;
+  padding: 18px 22px;
+  border-radius: 10px;
+  border: 1px solid #2b323b;
+  transition: 0.25s ease;
 }
 
-/* Optional: style inside NewsFeed */
-.news-section .news-item {
-  padding: 0.75rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-.news-section .news-item:last-child {
-  border-bottom: none;
-}
-
-/* ------------------------------- */
-/*       MARKET CARD ALIGNMENT     */
-/* ------------------------------- */
-
-.market-card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 1.25rem 1.5rem;
-  border-radius: 12px;
-  width: 100%;
-  transition: 0.2s ease-in-out;
+.market-card:hover,
+.gainer-card:hover,
+.loser-card:hover,
+.news-box:hover {
+  transform: translateY(-3px);
+  border-color: #3c4450;
 }
 
-.market-card:hover {
-  background: rgba(255, 255, 255, 0.08);
-  transform: translateY(-2px);
+/* Price text */
+.market-price {
+  font-size: 1.7rem;
+  font-weight: bold;
+  margin-bottom: 5px;
 }
 
-.market-card h3 {
-  margin-bottom: 0.4rem;
-  font-size: 1.2rem;
-  font-weight: 600;
-}
+/* Green & red coloring */
+.price-green { color: #30d158; }
+.price-red { color: #ff453a; }
 
-/* ------------------------------- */
-/*          GAINERS/LOSERS         */
-/* ------------------------------- */
-
+/* Gainer/loser rows */
 .gainer-item,
 .loser-item {
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  margin-bottom: 0.5rem;
-  font-size: 0.95rem;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background-color: #151a1f;
+  margin-bottom: 8px;
 }
 
-.gainer-item {
-  background: rgba(0, 255, 0, 0.08);
-  border-left: 4px solid #33ff33;
-}
-
-.loser-item {
-  background: rgba(255, 0, 0, 0.08);
-  border-left: 4px solid #ff4d4d;
-}
-
-/* ------------------------------- */
-/*        RESPONSIVE DESIGN        */
-/* ------------------------------- */
-
-@media (max-width: 1100px) {
+/* ========== RESPONSIVE FIXES ========== */
+@media (max-width: 1024px) {
   .dashboard-grid {
-    grid-template-columns: 1fr 1fr; /* more balanced */
-  }
-}
-
-@media (max-width: 900px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr; /* Single column layout */
+    grid-template-columns: 1fr; /* stack into 1 column */
   }
 
   .news-section {
-    grid-column: 1 / 2;
+    grid-column: span 1;
   }
 }
 
 @media (max-width: 600px) {
   .dashboard-container {
-    padding: 1.25rem;
-  }
-
-  .dashboard-container h1 {
-    font-size: 2rem;
-  }
-
-  .left-column h2,
-  .right-column h2,
-  .news-section h2 {
-    font-size: 1.4rem;
+    padding: 20px;
   }
 }
 
+.dashboard-container {
+  width: 100%;
+  max-width: 1400px;
+  margin: auto;
+  padding: 30px 40px;
+}
 
+/* TWO-COLUMN GRID */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+/* LEFT SIDE STACKS CARDS */
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* RIGHT SIDE STACKS G/L LISTS */
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* NEWS SPANS BOTH COLUMNS */
+.news-section {
+  grid-column: span 2;
+  margin-top: 30px;
+}
