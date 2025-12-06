@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Sparklines, SparklinesLine } from "react-sparklines";
 
-// Finnhub API key for current price
+// Finnhub API KEY
 const FINNHUB_KEY = "d4pljl1r01qjpnb03esgd4pljl1r01qjpnb03et0";
 
 export default function MarketCard({ title, symbol }) {
@@ -15,57 +15,58 @@ export default function MarketCard({ title, symbol }) {
 
   async function fetchData() {
     try {
-      let curr = 0;
-      let prev = 0;
+      let current = 0;
+      let previous = 0;
 
-      /* =====================================================
-         STOCKS & ETFs — FINNHUB for price / YAHOO for sparkline
-      ===================================================== */
+      /* ======================================================
+         A) STOCKS — FINNHUB PRICE + YAHOO SPARKLINE
+      ====================================================== */
       if (!symbol.startsWith("BINANCE:")) {
-        // Get real-time stock price from Finnhub
-        const res = await fetch(
+        /* ---- Price ---- */
+        const quote = await fetch(
           `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_KEY}`
         );
-        const data = await res.json();
+        const q = await quote.json();
 
-        curr = data.c || 0;
-        prev = data.pc || 0;
+        current = q.c || 0;
+        previous = q.pc || 0;
 
-        setPrice(curr);
-        setChange(prev ? ((curr - prev) / prev) * 100 : 0);
+        setPrice(current);
+        setChange(previous ? ((current - previous) / previous) * 100 : 0);
 
-        // Now get YAHOO sparkline through your backend proxy
-        const spark = await fetch(`/spark?symbol=${symbol}`);
-        const sparkData = await spark.json();
+        /* ---- Sparkline ---- */
+        const sparkRes = await fetch(`/spark?symbol=${symbol}`);
+        const sparkData = await sparkRes.json();
 
         if (Array.isArray(sparkData)) {
-          setHistory(sparkData);
+          setHistory(sparkData.filter((v) => v !== null));
         } else {
-          console.warn("Yahoo sparkline returned unexpected data:", sparkData);
+          console.warn("Yahoo spark invalid:", sparkData);
           setHistory([]);
         }
       }
 
-      /* =====================================================
-         CRYPTO — Binance (through backend proxy)
-      ===================================================== */
+      /* ======================================================
+         B) CRYPTO — BINANCE PRICE + HISTORY
+      ====================================================== */
       else {
         const pair = symbol.replace("BINANCE:", "");
 
-        const hist = await fetch(`/binance?symbol=${pair}&limit=7`);
-        const histData = await hist.json();
+        const histRes = await fetch(`/binance?symbol=${pair}&limit=14`);
+        const hist = await histRes.json();
 
-        if (Array.isArray(histData)) {
-          const closes = histData.map((row) => parseFloat(row[4]));
+        if (Array.isArray(hist)) {
+          const closes = hist.map((row) => parseFloat(row[4]));
 
-          curr = closes[closes.length - 1];
-          prev = closes[closes.length - 2];
+          current = closes[closes.length - 1];
+          previous = closes[closes.length - 2];
 
-          setPrice(curr);
-          setChange(prev ? ((curr - prev) / prev) * 100 : 0);
+          setPrice(current);
+          setChange(previous ? ((current - previous) / previous) * 100 : 0);
+
           setHistory(closes);
         } else {
-          console.warn("Binance invalid response:", histData);
+          console.warn("Binance invalid response:", hist);
           setHistory([]);
         }
       }
@@ -76,24 +77,22 @@ export default function MarketCard({ title, symbol }) {
 
   return (
     <div className="market-card">
-      <h3 className="card-title">{title}</h3>
+      <div>
+        <h3 className="card-title">{title}</h3>
+        <p className="card-price">${price.toLocaleString()}</p>
+        <p className={`card-change ${change >= 0 ? "green" : "red"}`}>
+          {change >= 0 ? "+" : ""}
+          {change.toFixed(2)}%
+        </p>
+      </div>
 
-      <p className="card-price">${price.toLocaleString()}</p>
-
-      <p className={`card-change ${change >= 0 ? "green" : "red"}`}>
-        {change >= 0 ? "+" : ""}
-        {change.toFixed(2)}%
-      </p>
-
-      {/* SPARKLINE — only shown if history exists */}
+      {/* Sparkline for both stocks + crypto */}
       {history.length > 0 && (
         <div className="sparkline-wrapper">
-          <Sparklines data={history} width={140} height={60} margin={5}>
+          <Sparklines data={history} width={120} height={40} margin={5}>
             <SparklinesLine
               color={change >= 0 ? "#4caf50" : "#ff4d4d"}
-              style={{
-                strokeWidth: 2.6,
-              }}
+              style={{ strokeWidth: 2 }}
             />
           </Sparklines>
         </div>
