@@ -1,0 +1,81 @@
+/* ===============================
+   GLOBAL APP STYLING (Dark Theme)
+   =============================== */
+
+   /* FIX LAYOUT: REMOVE REACT/VITE DEFAULT WIDTH LIMIT */
+html, body, #root {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  display: block;
+}
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #0e1117;
+  color: #f5f5f5;
+}
+
+/* Main layout wrapper */
+.app-container {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Navbar area (top bar) */
+.navbar {
+  background-color: #161b22;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #222;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar-title {
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.navbar-buttons {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+/* General card style used across widgets */
+.card {
+  background-color: #1b1f24;
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-bottom: 1.25rem;
+  border: 1px solid #222;
+}
+
+/* Text helpers */
+.green {
+  color: #4caf50 !important;
+}
+
+.red {
+  color: #ff4d4d !important;
+}
+
+/* Smooth transitions for UI elements */
+.card, .market-item, .gain-item, .loss-item {
+  transition: all 0.2s ease;
+}
