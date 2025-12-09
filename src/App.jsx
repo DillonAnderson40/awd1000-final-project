@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Watchlist from "./pages/Watchlist";
@@ -13,7 +13,9 @@ import "./App.css";
 
 function App() {
   return (
-    <Router>
+
+    <BrowserRouter basename="/awd1000-final-project">
+
       <Header />
 
       <main className="container mt-4">
@@ -32,7 +34,9 @@ function App() {
       </main>
 
       <Footer />
-    </Router>
+
+    </BrowserRouter>
+    
   );
 }
 

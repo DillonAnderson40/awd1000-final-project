@@ -9,7 +9,7 @@ import {
 
 const API_KEY = "d4pljl1r01qjpnb03esgd4pljl1r01qjpnb03et0";
 
-export default function StockCard({ stock, deleteStock }) {
+export default function StockCard({ stock, deleteStock, editStock }) {
   const { id, ticker, nickname, targetPrice, dateAdded } = stock;
 
   const [price, setPrice] = useState(null);
@@ -78,6 +78,23 @@ export default function StockCard({ stock, deleteStock }) {
 
   const trendColor = isUp ? "#00ff99" : isDown ? "#ff4d4d" : "#999";
 
+  // ⭐ NEW — Edit button handler
+  function handleEdit() {
+    const newNickname = prompt("Enter a new nickname:", nickname);
+    if (newNickname === null) return;
+
+    const newTarget = prompt("Enter new target price:", targetPrice);
+    if (newTarget === null) return;
+
+    const updatedStock = {
+      ...stock,
+      nickname: newNickname,
+      targetPrice: newTarget,
+    };
+
+    editStock(updatedStock);
+  }
+
   return (
     <div
       className="p-3 rounded shadow-sm"
@@ -126,7 +143,7 @@ export default function StockCard({ stock, deleteStock }) {
       </p>
 
       <div className="d-flex gap-2 mt-3">
-        <button className="btn btn-warning btn-sm">
+        <button className="btn btn-warning btn-sm" onClick={handleEdit}>
           <FaEdit /> Edit
         </button>
 

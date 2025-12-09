@@ -61,7 +61,7 @@ export default function MarketCard({ title, symbol }) {
         setChange(previous ? ((current - previous) / previous) * 100 : 0);
 
         // Sparkline
-        const sparkRes = await fetch(`/spark?symbol=${symbol}`);
+        const sparkRes = await fetch(`https://quantshift-backend.onrender.com/spark?symbol=${symbol}`);
         const spark = await safeJson(sparkRes);
 
         if (Array.isArray(spark)) {
@@ -78,7 +78,7 @@ export default function MarketCard({ title, symbol }) {
       else {
         const pair = symbol.replace("YAHOO:", "");
 
-        const histRes = await fetch(`/spark?symbol=${pair}`);
+        const histRes = await fetch(`https://quantshift-backend.onrender.com/spark?symbol=${pair}`);
         const hist = await safeJson(histRes);
 
         if (Array.isArray(hist) && hist.length > 2) {

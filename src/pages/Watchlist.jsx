@@ -5,17 +5,29 @@ export default function Watchlist() {
   const [stocks, setStocks] = useState([]);
   const [search, setSearch] = useState("");
 
+  // Load from localStorage on mount
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem("stocks")) || [];
     setStocks(saved);
   }, []);
 
+  // Delete a stock from list
   function deleteStock(id) {
     const updated = stocks.filter((s) => s.id !== id);
     setStocks(updated);
     localStorage.setItem("stocks", JSON.stringify(updated));
   }
 
+  // ⭐ NEW — Edit a stock in list
+  function editStock(updatedStock) {
+    const updated = stocks.map((s) =>
+      s.id === updatedStock.id ? updatedStock : s
+    );
+    setStocks(updated);
+    localStorage.setItem("stocks", JSON.stringify(updated));
+  }
+
+  // Search filter
   const filtered = stocks.filter((s) => {
     const q = search.toLowerCase();
     return (
@@ -44,7 +56,11 @@ export default function Watchlist() {
         ) : (
           filtered.map((stock) => (
             <div className="col-md-4" key={stock.id}>
-              <StockCard stock={stock} deleteStock={deleteStock} />
+              <StockCard
+                stock={stock}
+                deleteStock={deleteStock}
+                editStock={editStock}  // ⬅️ Passed down
+              />
             </div>
           ))
         )}
@@ -52,4 +68,3 @@ export default function Watchlist() {
     </div>
   );
 }
-
