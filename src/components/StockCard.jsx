@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FaChartLine,
   FaTrash,
@@ -9,8 +10,9 @@ import {
 
 const API_KEY = "d4pljl1r01qjpnb03esgd4pljl1r01qjpnb03et0";
 
-export default function StockCard({ stock, deleteStock, editStock }) {
-  const { id, ticker, nickname, targetPrice, dateAdded } = stock;
+export default function StockCard({ stock, deleteStock }) {
+  const navigate = useNavigate();
+  const { id, ticker, nickname, targetPrice } = stock;
 
   const [price, setPrice] = useState(null);
   const [change, setChange] = useState(null);
@@ -78,21 +80,11 @@ export default function StockCard({ stock, deleteStock, editStock }) {
 
   const trendColor = isUp ? "#00ff99" : isDown ? "#ff4d4d" : "#999";
 
-  // ⭐ NEW — Edit button handler
+  // ⭐ NEW — Navigate to Add Stock page with stock data
   function handleEdit() {
-    const newNickname = prompt("Enter a new nickname:", nickname);
-    if (newNickname === null) return;
-
-    const newTarget = prompt("Enter new target price:", targetPrice);
-    if (newTarget === null) return;
-
-    const updatedStock = {
-      ...stock,
-      nickname: newNickname,
-      targetPrice: newTarget,
-    };
-
-    editStock(updatedStock);
+    navigate("/add", {
+      state: { stock }, // pass entire stock object to edit page
+    });
   }
 
   return (
